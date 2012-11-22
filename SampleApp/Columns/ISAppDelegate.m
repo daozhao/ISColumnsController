@@ -21,11 +21,15 @@
     self.columnsController = [[[ISColumnsController alloc] init] autorelease];
     self.columnsController.delegate = self;
     self.columnsController.navigationItem.titleView = [self loadTitleView];
-    self.columnsController.navigationItem.rightBarButtonItem =
-    [[[UIBarButtonItem alloc] initWithTitle:@"Reload"
-                                      style:UIBarButtonItemStylePlain
-                                     target:self
-                                     action:@selector(reloadViewControllers)] autorelease];
+    self.columnsController.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"Reload"
+                                                                                                 style:UIBarButtonItemStylePlain
+                                                                                                target:self
+                                                                                                action:@selector(reloadViewControllers)] autorelease];
+    self.columnsController.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"Resize"
+                                                                                                 style:UIBarButtonItemStylePlain
+                                                                                                target:self
+                                                                                                action:@selector(resizeView)] autorelease];
+    
     [self.columnsController setToolbarItems:[NSArray arrayWithObjects:
                                              [[[UIBarButtonItem alloc] initWithTitle:@"Add"
                                                                                style:UIBarButtonItemStyleBordered
@@ -43,10 +47,10 @@
                                                                                 style:UIBarButtonItemStyleBordered
                                                                                target:self
                                                                                action:@selector(delControllerAtOne)] autorelease]
-                                             ,[[[UIBarButtonItem alloc] initWithTitle:@"Resize"
+                                             ,[[[UIBarButtonItem alloc] initWithTitle:@"Del@last"
                                                                                 style:UIBarButtonItemStyleBordered
                                                                                target:self
-                                                                               action:@selector(resizeView)] autorelease]
+                                                                               action:@selector(delControllerAtLast)] autorelease]
                                              , nil]];
     [self reloadViewControllers];
     
@@ -126,6 +130,11 @@
 -(void) delControllerAtOne
 {
     [self.columnsController delViewControllerAtIndex:0];
+}
+
+-(void) delControllerAtLast
+{
+    [self.columnsController delViewControllerAtIndex:self.columnsController.viewControllers.count-1];
 }
 
 - (void)addControllerWithAnimations
