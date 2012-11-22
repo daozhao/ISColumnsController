@@ -410,7 +410,7 @@
         
         if ( self.currentPage >= self.viewControllers.count ){
             self.currentPage = self.viewControllers.count - 1;
-        } if ( index < self.currentPage ) {
+        } else if ( index < self.currentPage ) {
             self.currentPage = self.currentPage ? self.currentPage - 1 : 0;
             self.scrollView.contentOffset = CGPointMake(self.scrollView.frame.size.width * self.currentPage,0);
         }else {
