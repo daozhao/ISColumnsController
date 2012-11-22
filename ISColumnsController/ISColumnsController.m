@@ -3,6 +3,9 @@
 
 @interface ISColumnsController ()
 
+@property (nonatomic, assign) BOOL isSmallSize;
+@property (nonatomic, assign) UITapGestureRecognizer *tap;
+
 - (void)reloadChildViewControllers;
 - (void)enableScrollsToTop;
 - (void)disableScrollsToTop;
@@ -46,6 +49,14 @@
     self.scrollView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
     self.scrollView.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
     [self.view addSubview:self.scrollView];
+    
+    if (!_tap) {
+        UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+        t.delegate = (id<UIGestureRecognizerDelegate>)self;
+        [self.view addGestureRecognizer:t];
+        [t setEnabled:NO];
+        _tap = t;
+    }
     
     CALayer *topShadowLayer = [CALayer layer];
     UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectMake(-10, -10, 10000, 13)];
@@ -231,22 +242,59 @@
 {
     CGFloat offset = scrollView.contentOffset.x;
     
-    for (UIViewController *viewController in self.viewControllers) {
-        NSInteger index = [self.viewControllers indexOfObject:viewController];
-        CGFloat width = self.scrollView.frame.size.width;
-        CGFloat y = index * width;
-        CGFloat value = (offset-y)/width;
-        CGFloat scale = 1.f-fabs(value);
-        if (scale > 1.f) scale = 1.f;
-        if (scale < .8f) scale = .8f;
-        
-        viewController.view.transform = CGAffineTransformMakeScale(scale, scale);
+    if ( !self.isSmallSize )
+    {
+        for (UIViewController *viewController in self.viewControllers) {
+            NSInteger index = [self.viewControllers indexOfObject:viewController];
+            CGFloat width = self.scrollView.frame.size.width;
+            CGFloat y = index * width;
+            CGFloat value = (offset-y)/width;
+            CGFloat scale = 1.f-fabs(value);
+            if (scale > 1.f) scale = 1.f;
+            if (scale < .8f) scale = .8f;
+            
+            viewController.view.transform = CGAffineTransformMakeScale(scale, scale);
+        }
     }
 
     for (UIViewController *viewController in self.childViewControllers) {
         CALayer *layer = viewController.view.layer;
         layer.shadowPath = [UIBezierPath bezierPathWithRect:viewController.view.bounds].CGPath;
     }
+}
+
+
+- (void)tap:(UITapGestureRecognizer*)gesture {
+    
+    [gesture setEnabled:NO];
+    [self resizeSubViewControler];
+    
+}
+
+- (void) resizeSubViewControlerToSize:(CGFloat) scale
+{
+    scale = (scale > 1.0) ? 1.0 : scale;
+    [UIView animateWithDuration:.3 animations:^{
+        for (UIViewController *viewController in self.viewControllers) {
+            // 这里负责缩小页面的。
+            viewController.view.transform = CGAffineTransformMakeScale(scale, scale);
+            viewController.view.userInteractionEnabled = (1.0 <= scale) ? YES : NO;
+            CALayer *layer = viewController.view.layer;
+            layer.shadowPath = [UIBezierPath bezierPathWithRect:viewController.view.bounds].CGPath;
+        }
+    } completion:^(BOOL finished) {
+        self.isSmallSize = (1.0 <= scale) ? NO : YES;
+        if ( self.isSmallSize ){
+            _tap.enabled = YES;
+        } else {
+            _tap.enabled = NO;
+        }
+    }];
+}
+
+- (void) resizeSubViewControler
+{
+    [self resizeSubViewControlerToSize:(self.isSmallSize) ? 1.0 : 0.8];
 }
 
 #pragma mark - IScolumnsControllerdelegate
