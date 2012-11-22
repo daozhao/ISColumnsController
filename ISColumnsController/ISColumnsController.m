@@ -18,47 +18,17 @@
     self = [super init];
     if (self) {
         [self view];
-        [self loadTitleView];
         [self addObserver:self
                forKeyPath:@"viewControllers"
                   options:NSKeyValueObservingOptionNew
                   context:nil];
+        [self addObserver:self
+                       forKeyPath:@"currentPage"
+                          options:(NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld)
+                          context:nil];
+        
     }
     return self;
-}
-
-- (void)loadTitleView
-{
-    UIView *titleView = [[[UIView alloc] init] autorelease];
-    titleView.frame = CGRectMake(0, 0, 150, 44);
-    titleView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
-    
-    self.pageControl = [[[UIPageControl alloc] init] autorelease];
-    self.pageControl.numberOfPages = 3;
-    self.pageControl.frame = CGRectMake(0, 27, 150, 14);
-    self.pageControl.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin|
-                                         UIViewAutoresizingFlexibleBottomMargin|
-                                         UIViewAutoresizingFlexibleHeight);
-    [self.pageControl addTarget:self
-                         action:@selector(didTapPageControl)
-               forControlEvents:UIControlEventValueChanged];
-    
-    [titleView addSubview:self.pageControl];
-    
-    self.titleLabel = [[[UILabel alloc] init] autorelease];
-    self.titleLabel.frame = CGRectMake(0, 5, 150, 24);
-    self.titleLabel.font = [UIFont boldSystemFontOfSize:18];
-    self.titleLabel.backgroundColor = [UIColor clearColor];
-    self.titleLabel.textAlignment = UITextAlignmentCenter;
-    self.titleLabel.textColor = [UIColor whiteColor];
-    self.titleLabel.shadowColor = [UIColor darkGrayColor];
-    self.titleLabel.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin|
-                                        UIViewAutoresizingFlexibleBottomMargin|
-                                        UIViewAutoresizingFlexibleHeight);
-    
-    [titleView addSubview:self.titleLabel];
-    
-    self.navigationItem.titleView = titleView;
 }
 
 - (void)loadView
@@ -101,10 +71,6 @@
     [super viewDidLoad];
     
     [self reloadChildViewControllers];
-    [self.pageControl addObserver:self
-                       forKeyPath:@"currentPage"
-                          options:(NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld)
-                          context:nil];
 }
 
 - (void)viewDidUnload
@@ -117,12 +83,10 @@
 - (void)dealloc
 {
     [self removeObserver:self forKeyPath:@"viewControllers"];
-    [self.pageControl removeObserver:self forKeyPath:@"currentPage"];
+    [self removeObserver:self forKeyPath:@"currentPage"];
     
     [_viewControllers release];
     [_scrollView release];
-    [_titleLabel release];
-    [_pageControl release];
     
     [super dealloc];
 }
@@ -148,7 +112,7 @@
     
     // go to the right page
     self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width * [self.viewControllers count], 1);
-    [self.scrollView setContentOffset:CGPointMake(self.scrollView.frame.size.width*self.pageControl.currentPage, 0) animated:NO];
+    [self.scrollView setContentOffset:CGPointMake(self.scrollView.frame.size.width*self.currentPage, 0) animated:NO];
 }
 
 #pragma mark - key value observation
@@ -160,7 +124,7 @@
         [self disableScrollsToTop];
     }
     
-    if (object == self.pageControl && [keyPath isEqualToString:@"currentPage"]) {
+    if (object == self && [keyPath isEqualToString:@"currentPage"]) {
         NSInteger previousIndex = [[change objectForKey:@"old"] integerValue];
         NSInteger currentIndex  = [[change objectForKey:@"new"] integerValue];
         
@@ -171,21 +135,6 @@
 }
 
 #pragma mark - action
-
-- (void)didTapPageControl
-{
-    CGFloat offset = self.scrollView.contentOffset.x;
-    CGFloat width  = self.scrollView.frame.size.width;
-    
-    NSInteger currentPage = (offset+(width/2))/width;
-    NSInteger nextPage    = self.pageControl.currentPage;
-    
-    [self.scrollView setContentOffset:CGPointMake(self.scrollView.frame.size.width*nextPage, 0) animated:YES];
-    
-    if (currentPage != nextPage) {
-        [self didChangeCurrentPage:nextPage previousPage:currentPage];
-    }
-}
 
 - (void)didChangeCurrentPage:(NSInteger)currentIndex previousPage:(NSInteger)previousIndex
 {
@@ -199,7 +148,7 @@
         [currentViewController didBecomeActive];
     }
 
-    self.titleLabel.text = currentViewController.navigationItem.title;
+    [self didChangeCurrentPageDelegate];
 }
 
 - (void)reloadChildViewControllers
@@ -219,8 +168,8 @@
         [self addChildViewController:viewController];
         [self.scrollView addSubview:viewController.view];
         [viewController didMoveToParentViewController:self];
-        if (index == self.pageControl.currentPage) {
-            self.titleLabel.text = viewController.navigationItem.title;
+        if (index == self.currentPage) {
+            [self didChangeCurrentPageDelegate];
             if ([viewController respondsToSelector:@selector(didBecomeActive)]) {
                 [(id)viewController didBecomeActive];
             }
@@ -252,7 +201,7 @@
 {
     for (UIViewController *viewController in self.viewControllers) {
         NSInteger index = [self.viewControllers indexOfObject:viewController];
-        if (index != self.pageControl.currentPage) {
+        if (index != self.currentPage) {
             for (UIView *subview in [viewController.view subviews]) {
                 if ([subview respondsToSelector:@selector(scrollsToTop)]) {
                     [(UIScrollView *)subview setScrollsToTop:NO];
@@ -273,7 +222,7 @@
 {
     CGFloat offset = self.scrollView.contentOffset.x;
     CGFloat width = self.scrollView.frame.size.width;
-    self.pageControl.currentPage = (offset+(width/2))/width;
+    self.currentPage = (offset+(width/2))/width;
     
     [self disableScrollsToTop];
 }
@@ -299,5 +248,18 @@
         layer.shadowPath = [UIBezierPath bezierPathWithRect:viewController.view.bounds].CGPath;
     }
 }
+
+#pragma mark - IScolumnsControllerdelegate
+- (void) didChangeCurrentPageDelegate
+{
+    if ( _delegate && [_delegate respondsToSelector:@selector(didChangePage:currentPage:numberOfPages:)] ){
+        if ( self.currentPage < self.viewControllers.count ){
+            [_delegate didChangePage:[self.viewControllers objectAtIndex:self.currentPage] currentPage:self.currentPage numberOfPages:self.viewControllers.count];
+        } else {
+            [_delegate didChangePage:nil currentPage:self.currentPage numberOfPages:self.viewControllers.count];
+        }
+    }
+}
+
 
 @end
