@@ -13,7 +13,7 @@
 
 @interface ISColumnsController : UIViewController <UIScrollViewDelegate>
 
-@property (retain, nonatomic) NSArray       *viewControllers;
+@property (retain, nonatomic) NSMutableArray *viewControllers;
 @property (retain, nonatomic) UIScrollView  *scrollView;
 
 @property (assign, nonatomic) id<ISColumnsControllerDelegate> delegate;

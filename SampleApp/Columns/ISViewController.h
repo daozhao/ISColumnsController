@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
+#import "ISColumnsController.h"
 
-@interface ISViewController : UIViewController
+@interface ISViewController : UIViewController <ISColumnsControllerChild>
 
 - (IBAction)pushViewController;
 

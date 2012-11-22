@@ -141,6 +141,7 @@
         
         if (previousIndex != currentIndex) {
             [self didChangeCurrentPage:currentIndex previousPage:previousIndex];
+            [self didChangeCurrentPageDelegate];
         }
     }
 }
@@ -149,17 +150,21 @@
 
 - (void)didChangeCurrentPage:(NSInteger)currentIndex previousPage:(NSInteger)previousIndex
 {
-    UIViewController <ISColumnsControllerChild> *previousViewController = [self.viewControllers objectAtIndex:previousIndex];
-    if ([previousViewController respondsToSelector:@selector(didResignActive)]) {
-        [previousViewController didResignActive];
+    if ( previousIndex < self.viewControllers.count ){
+        UIViewController <ISColumnsControllerChild> *previousViewController = [self.viewControllers objectAtIndex:previousIndex];
+        if ([previousViewController respondsToSelector:@selector(didResignActive)]) {
+            [previousViewController didResignActive];
+        }
     }
     
-    UIViewController <ISColumnsControllerChild> *currentViewController = [self.viewControllers objectAtIndex:currentIndex];
-    if ([currentViewController respondsToSelector:@selector(didBecomeActive)]) {
-        [currentViewController didBecomeActive];
+    if ( currentIndex < self.viewControllers.count ){
+        UIViewController <ISColumnsControllerChild> *currentViewController = [self.viewControllers objectAtIndex:currentIndex];
+        if ([currentViewController respondsToSelector:@selector(didBecomeActive)]) {
+            [currentViewController didBecomeActive];
+        }
     }
 
-    [self didChangeCurrentPageDelegate];
+    //[self didChangeCurrentPageDelegate];
 }
 
 - (void)reloadChildViewControllers
@@ -276,7 +281,6 @@
     scale = (scale > 1.0) ? 1.0 : scale;
     [UIView animateWithDuration:.3 animations:^{
         for (UIViewController *viewController in self.viewControllers) {
-            // 这里负责缩小页面的。
             viewController.view.transform = CGAffineTransformMakeScale(scale, scale);
             viewController.view.userInteractionEnabled = (1.0 <= scale) ? YES : NO;
             CALayer *layer = viewController.view.layer;
@@ -295,6 +299,204 @@
 - (void) resizeSubViewControler
 {
     [self resizeSubViewControlerToSize:(self.isSmallSize) ? 1.0 : 0.8];
+}
+
+- (void) addViewController:(UIViewController *) viewController withAnimations:(BOOL) animations
+{
+    
+    CGFloat originScale = self.isSmallSize ? 0.8 : 1.0;
+    
+    [self.viewControllers addObject:viewController];
+    
+    NSInteger index = [self.viewControllers indexOfObject:viewController];
+    viewController.view.frame = CGRectMake(self.scrollView.frame.size.width * index,
+                                           (!animations) ? 0 : self.scrollView.frame.size.height,
+                                           self.scrollView.frame.size.width,
+                                           self.scrollView.frame.size.height);
+    CALayer *layer = viewController.view.layer;
+    layer.shadowOpacity = .5f;
+    layer.shadowOffset = CGSizeMake(10, 10);
+    layer.shadowPath = [UIBezierPath bezierPathWithRect:viewController.view.bounds].CGPath;
+    
+    [self addChildViewController:viewController];
+    [self.scrollView addSubview:viewController.view];
+    [viewController didMoveToParentViewController:self];
+    if ( self.isSmallSize ){
+        viewController.view.transform = CGAffineTransformMakeScale(0.8, 0.8);
+    }
+    
+    if ( ! animations ){
+        if ( 1 == self.viewControllers.count ){
+            self.currentPage = 0;
+        } else {
+            [self didChangeCurrentPageDelegate];
+        }
+    }
+    self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width * [self.viewControllers count], 1);
+    
+    if ( animations ){
+        
+        CGFloat scale = 0.8;
+        [UIView animateWithDuration:.3 animations:^{
+            for (UIViewController *viewController in self.viewControllers) {
+                // 这里负责缩小页面的。
+                viewController.view.transform = CGAffineTransformMakeScale(scale, scale);
+                viewController.view.userInteractionEnabled = (1.0 <= scale) ? YES : NO;
+                CALayer *layer = viewController.view.layer;
+                layer.shadowPath = [UIBezierPath bezierPathWithRect:viewController.view.bounds].CGPath;
+            }
+        } completion:^(BOOL finished) {
+            self.isSmallSize = (1.0 <= scale) ? NO : YES;
+            if ( self.isSmallSize ){
+                _tap.enabled = YES;
+            } else {
+                _tap.enabled = NO;
+            }
+            
+            [UIView animateWithDuration:.3 animations:^{
+                self.scrollView.contentOffset = CGPointMake(self.scrollView.frame.size.width * (self.viewControllers.count -1), 0);
+            } completion:^(BOOL finished) {
+                [UIView animateWithDuration:.3 animations:^{
+                    viewController.view.frame = CGRectMake(viewController.view.frame.origin.x,
+                                                           viewController.view.frame.origin.y - self.scrollView.frame.size.height,
+                                                           viewController.view.frame.size.width,
+                                                           viewController.view.frame.size.height);
+                } completion:^(BOOL finished) {
+                    self.currentPage = self.viewControllers.count - 1;
+                    if ( 1.0 == originScale ){
+                        [self resizeSubViewControlerToSize:originScale];
+                    }
+                    
+                    
+                }];
+            }];
+            
+        }];
+        
+    } else {
+        //RECTLOG(viewController.view.frame,@" after del frame:");
+    }
+}
+
+- (void) delViewController:(UIViewController *) viewController
+{
+    NSInteger index = [self.viewControllers indexOfObject:viewController];
+    [self delViewControllerAtIndex:index];
+    
+}
+- (void) delViewControllerAtIndex:(int) index
+{
+    if ( index != self.currentPage ){
+        UIViewController<ISColumnsControllerChild> *removeViewController = [self.viewControllers objectAtIndex:index];
+        [removeViewController.view removeFromSuperview];
+        [removeViewController removeFromParentViewController];
+        [self.viewControllers removeObjectAtIndex:index];
+        
+        if ([removeViewController respondsToSelector:@selector(didResignActive)]) {
+            [removeViewController didResignActive];
+        }
+       
+        for ( int i = index; i < [self.viewControllers count] ; i++ ){
+            UIViewController *viewController = [self.viewControllers objectAtIndex:i];
+            viewController.view.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+            viewController.view.frame = CGRectMake(self.scrollView.frame.size.width * i,
+                                                   0,
+                                                   self.scrollView.frame.size.width,
+                                                   viewController.view.frame.size.height
+                                                   //self.scrollView.frame.size.height
+                                                   );
+        }
+        self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width * [self.viewControllers count], 1);
+        
+        if ( self.currentPage >= self.viewControllers.count ){
+            self.currentPage = self.viewControllers.count - 1;
+        } if ( index < self.currentPage ) {
+            self.currentPage = self.currentPage ? self.currentPage - 1 : 0;
+            self.scrollView.contentOffset = CGPointMake(self.scrollView.frame.size.width * self.currentPage,0);
+        }else {
+            [self didChangeCurrentPageDelegate];
+        }
+        
+    } else {
+        CGFloat originScale = self.isSmallSize ? 0.8 : 1.0;
+        CGFloat scale = 0.8f;
+        [UIView animateWithDuration:.3 animations:^{
+            for (UIViewController *viewController in self.viewControllers) {
+                // 这里负责缩小页面的。
+                viewController.view.transform = CGAffineTransformMakeScale(scale, scale);
+                viewController.view.userInteractionEnabled = (1.0 <= scale) ? YES : NO;
+                CALayer *layer = viewController.view.layer;
+                layer.shadowPath = [UIBezierPath bezierPathWithRect:viewController.view.bounds].CGPath;
+            }
+        } completion:^(BOOL finished) {
+            self.isSmallSize = (1.0 <= scale) ? NO : YES;
+            if ( self.isSmallSize ){
+                _tap.enabled = YES;
+            } else {
+                _tap.enabled = NO;
+            }
+            
+            [UIView animateWithDuration:.3 animations:^{
+                UIViewController *removeViewController = [self.viewControllers objectAtIndex:index];
+                //removeViewController.view.alpha = 0.0;
+                removeViewController.view.frame = CGRectMake(removeViewController.view.frame.origin.x
+                                                             ,removeViewController.view.frame.origin.y - self.scrollView.frame.size.height
+                                                             ,removeViewController.view.frame.size.width
+                                                             ,removeViewController.view.frame.size.height
+                                                             );
+                
+            } completion:^(BOOL finished) {
+                
+                UIViewController<ISColumnsControllerChild> *removeViewController = [self.viewControllers objectAtIndex:index];
+                
+                if ([removeViewController respondsToSelector:@selector(didResignActive)]) {
+                    [removeViewController didResignActive];
+                }
+                [removeViewController.view removeFromSuperview];
+                [removeViewController removeFromParentViewController];
+                [self.viewControllers removeObjectAtIndex:index];
+                
+                [UIView animateWithDuration:.3 animations:^{
+                    for ( int i = index; i < [self.viewControllers count] ; i++ ){
+                        UIViewController *viewController = [self.viewControllers objectAtIndex:i];
+                        viewController.view.frame = CGRectMake(viewController.view.frame.origin.x - self.scrollView.frame.size.width
+                                                               ,viewController.view.frame.origin.y
+                                                               ,viewController.view.frame.size.width
+                                                               ,viewController.view.frame.size.height
+                                                               );
+                    }
+                } completion:^(BOOL finished) {
+                    //self.pageControl.numberOfPages = [self.viewControllers count];
+                    if ( self.currentPage >= self.viewControllers.count ){
+                        self.currentPage = self.viewControllers.count ? self.viewControllers.count - 1 : 0 ;
+                    } else {
+                        UIViewController<ISColumnsControllerChild> *viewController = [self.viewControllers objectAtIndex:index];
+                        if ([viewController respondsToSelector:@selector(didBecomeActive)]) {
+                            [viewController didBecomeActive];
+                        }
+                        [self didChangeCurrentPageDelegate];
+                    }
+                    
+                    self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width * [self.viewControllers count], 1);
+                    if ( 1.0 == originScale ){
+                        [self resizeSubViewControlerToSize:originScale];
+                    }
+                    
+                }];
+                
+            }];
+            
+            
+        }];
+        
+    }
+    
+}
+
+- (void) delCurrentViewContrller
+{
+    [self delViewControllerAtIndex:self.currentPage];
+    
 }
 
 #pragma mark - IScolumnsControllerdelegate

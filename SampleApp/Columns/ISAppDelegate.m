@@ -26,10 +26,33 @@
                                       style:UIBarButtonItemStylePlain
                                      target:self
                                      action:@selector(reloadViewControllers)] autorelease];
+    [self.columnsController setToolbarItems:[NSArray arrayWithObjects:
+                                             [[[UIBarButtonItem alloc] initWithTitle:@"Add"
+                                                                               style:UIBarButtonItemStyleBordered
+                                                                              target:self
+                                                                              action:@selector(addController)] autorelease]
+                                             ,[[[UIBarButtonItem alloc] initWithTitle:@"Add@A"
+                                                                                style:UIBarButtonItemStyleBordered
+                                                                               target:self
+                                                                               action:@selector(addControllerWithAnimations)] autorelease]
+                                             ,[[[UIBarButtonItem alloc] initWithTitle:@"Del"
+                                                                                style:UIBarButtonItemStyleBordered
+                                                                               target:self
+                                                                               action:@selector(delController)] autorelease]
+                                             ,[[[UIBarButtonItem alloc] initWithTitle:@"Del@1"
+                                                                                style:UIBarButtonItemStyleBordered
+                                                                               target:self
+                                                                               action:@selector(delControllerAtOne)] autorelease]
+                                             ,[[[UIBarButtonItem alloc] initWithTitle:@"Resize"
+                                                                                style:UIBarButtonItemStyleBordered
+                                                                               target:self
+                                                                               action:@selector(resizeView)] autorelease]
+                                             , nil]];
     [self reloadViewControllers];
     
     self.navigationController = [[[UINavigationController alloc] init] autorelease];
     self.navigationController.viewControllers = [NSArray arrayWithObject:self.columnsController];
+    [self.navigationController setToolbarHidden:NO];
     
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     self.window.backgroundColor = [UIColor whiteColor];
@@ -49,7 +72,7 @@
     ISViewController *viewController3 = [[[ISViewController alloc] init] autorelease];
     viewController3.navigationItem.title = @"ViewController 3";
     
-    self.columnsController.viewControllers = [NSArray arrayWithObjects:
+    self.columnsController.viewControllers = [NSMutableArray arrayWithObjects:
                                               viewController1,
                                               viewController2,
                                               viewController3, nil];
@@ -88,6 +111,35 @@
     
     //self.navigationItem.titleView = titleView;
     return titleView;
+}
+
+- (void) resizeView
+{
+    [self.columnsController resizeSubViewControler];
+}
+
+-(void) delController
+{
+    [self.columnsController delCurrentViewContrller];
+}
+
+-(void) delControllerAtOne
+{
+    [self.columnsController delViewControllerAtIndex:0];
+}
+
+- (void)addControllerWithAnimations
+{
+    ISViewController *viewController3 = [[[ISViewController alloc] init] autorelease];
+    viewController3.navigationItem.title = @"ViewController 3";
+    [self.columnsController addViewController: viewController3 withAnimations:YES];
+}
+
+- (void)addController
+{
+    ISViewController *viewController3 = [[[ISViewController alloc] init] autorelease];
+    viewController3.navigationItem.title = @"ViewController 3";
+    [self.columnsController addViewController: viewController3 withAnimations:NO];
 }
 
 - (void)didChangePage:(UIViewController *) viewController currentPage:(NSInteger) page numberOfPages:(NSInteger) count
