@@ -20,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4487BF48168C2CCE0021625D /* ARCSupporDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARCSupporDefine.h; sourceTree = "<group>"; };
 		7737A06415F34ADD0078CA7B /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		7737A06715F34D6D0078CA7B /* ISViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ISViewController.xib; sourceTree = "<group>"; };
 		7737A06D15F350610078CA7B /* ISColumnsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ISColumnsController.h; sourceTree = "<group>"; };
@@ -56,6 +57,7 @@
 		7737A06C15F350610078CA7B /* ISColumnsController */ = {
 			isa = PBXGroup;
 			children = (
+				4487BF48168C2CCE0021625D /* ARCSupporDefine.h */,
 				7737A06D15F350610078CA7B /* ISColumnsController.h */,
 				7737A06E15F350610078CA7B /* ISColumnsController.m */,
 			);
@@ -205,6 +207,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -229,6 +233,8 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -246,6 +252,8 @@
 		77E3744B158E0C44007C75E8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Columns/Columns-Prefix.pch";
 				INFOPLIST_FILE = "Columns/Columns-Info.plist";
@@ -259,6 +267,8 @@
 		77E3744C158E0C44007C75E8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Columns/Columns-Prefix.pch";
 				INFOPLIST_FILE = "Columns/Columns-Info.plist";

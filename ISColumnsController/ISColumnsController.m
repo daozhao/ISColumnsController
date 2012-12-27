@@ -99,7 +99,7 @@
     [_viewControllers release];
     [_scrollView release];
     
-    [super dealloc];
+    [super don_dealloc];
 }
 
 #pragma mark - interface orientation

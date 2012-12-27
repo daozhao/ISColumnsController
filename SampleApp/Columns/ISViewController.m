@@ -53,7 +53,7 @@
 - (void)dealloc
 {
     NSLog(@"[%@ %@]", [self class], NSStringFromSelector(_cmd));
-    [super dealloc];
+    [super don_dealloc];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation

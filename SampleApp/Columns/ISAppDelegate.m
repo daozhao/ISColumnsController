@@ -13,7 +13,7 @@
 - (void)dealloc
 {
     [_window release], _window = nil;
-    [super dealloc];
+    [super don_dealloc];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions

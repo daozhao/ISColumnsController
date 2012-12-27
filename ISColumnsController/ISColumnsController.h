@@ -1,4 +1,5 @@
 #import <UIKit/UIKit.h>
+#import "ARCSupporDefine.h"
 
 @protocol ISColumnsControllerChild <NSObject>
 @optional
