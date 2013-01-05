@@ -306,6 +306,9 @@
     
     CGFloat originScale = self.isSmallSize ? 0.8 : 1.0;
     
+    if ( nil == self.viewControllers ) {
+        _viewControllers = [[NSMutableArray alloc] init];
+    }
     [self.viewControllers addObject:viewController];
     
     NSInteger index = [self.viewControllers indexOfObject:viewController];
