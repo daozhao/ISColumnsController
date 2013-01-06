@@ -39,6 +39,10 @@
                                                                                 style:UIBarButtonItemStyleBordered
                                                                                target:self
                                                                                action:@selector(addControllerWithAnimations)] autorelease]
+                                             ,[[[UIBarButtonItem alloc] initWithTitle:@"Move2"
+                                                                                style:UIBarButtonItemStyleBordered
+                                                                               target:self
+                                                                               action:@selector(moveToController)] autorelease]
                                              ,[[[UIBarButtonItem alloc] initWithTitle:@"Del"
                                                                                 style:UIBarButtonItemStyleBordered
                                                                                target:self
@@ -150,7 +154,13 @@
     viewController3.navigationItem.title = @"ViewController 3";
     [self.columnsController addViewController: viewController3 withAnimations:NO];
 }
-
+- (void)moveToController
+{
+//    ISViewController *viewController3 = [[[ISViewController alloc] init] autorelease];
+//    viewController3.navigationItem.title = @"ViewController 3";
+    [self.columnsController moveToViewControllerAtIndex:2 withAnimations:YES];
+//    [self.columnsController moveToViewControllerByIndex:2 withAnimations:NO];
+}
 - (void)didChangePage:(UIViewController *) viewController currentPage:(NSInteger) page numberOfPages:(NSInteger) count
 {
     NSLog(@"didChangePage:%@ currentPage:%d numberOfPages:%d",viewController,page,count);

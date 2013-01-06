@@ -28,4 +28,7 @@
 
 - (void) addViewController:(UIViewController *) viewController withAnimations:(BOOL) animations;
 
+- (void) moveToViewController:(UIViewController *) viewController withAnimations:(BOOL) animations;
+- (void) moveToViewControllerAtIndex:(NSUInteger) index withAnimations:(BOOL) animations;
+
 @end

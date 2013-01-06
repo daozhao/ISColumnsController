@@ -286,13 +286,10 @@
             CALayer *layer = viewController.view.layer;
             layer.shadowPath = [UIBezierPath bezierPathWithRect:viewController.view.bounds].CGPath;
         }
-    } completion:^(BOOL finished) {
         self.isSmallSize = (1.0 <= scale) ? NO : YES;
-        if ( self.isSmallSize ){
-            _tap.enabled = YES;
-        } else {
-            _tap.enabled = NO;
-        }
+        _tap.enabled = self.isSmallSize ? YES : NO;
+    } completion:^(BOOL finished) {
+        
     }];
 }
 
@@ -350,11 +347,7 @@
             }
         } completion:^(BOOL finished) {
             self.isSmallSize = (1.0 <= scale) ? NO : YES;
-            if ( self.isSmallSize ){
-                _tap.enabled = YES;
-            } else {
-                _tap.enabled = NO;
-            }
+            _tap.enabled = self.isSmallSize ? YES : NO;
             
             [UIView animateWithDuration:.3 animations:^{
                 self.scrollView.contentOffset = CGPointMake(self.scrollView.frame.size.width * (self.viewControllers.count -1), 0);
@@ -384,11 +377,17 @@
 - (void) delViewController:(UIViewController *) viewController
 {
     NSInteger index = [self.viewControllers indexOfObject:viewController];
-    [self delViewControllerAtIndex:index];
+    if ( NSNotFound != index ) {
+        [self delViewControllerAtIndex:index];
+    }
     
 }
 - (void) delViewControllerAtIndex:(int) index
 {
+    if (index >= self.viewControllers.count ){
+        return;
+    }
+    
     if ( index != self.currentPage ){
         UIViewController<ISColumnsControllerChild> *removeViewController = [self.viewControllers objectAtIndex:index];
         [removeViewController.view removeFromSuperview];
@@ -433,11 +432,7 @@
             }
         } completion:^(BOOL finished) {
             self.isSmallSize = (1.0 <= scale) ? NO : YES;
-            if ( self.isSmallSize ){
-                _tap.enabled = YES;
-            } else {
-                _tap.enabled = NO;
-            }
+            _tap.enabled = self.isSmallSize ? YES : NO;
             
             [UIView animateWithDuration:.3 animations:^{
                 UIViewController *removeViewController = [self.viewControllers objectAtIndex:index];
@@ -494,6 +489,56 @@
         
     }
     
+}
+
+
+- (void) moveToViewController:(UIViewController *) viewController withAnimations:(BOOL) animations
+{
+    NSUInteger index = [self.viewControllers indexOfObject:viewController];
+    if ( NSNotFound != index ){
+        [self moveToViewControllerAtIndex:index withAnimations:animations];
+    }
+    
+}
+- (void) moveToViewControllerAtIndex:(NSUInteger) index withAnimations:(BOOL) animations
+{
+    if ( index == self.currentPage ){
+        return;
+    }
+    if (index >= self.viewControllers.count ){
+        return;
+    }
+        
+    if ( animations ){
+        CGFloat originScale = self.isSmallSize ? 0.8 : 1.0;
+        CGFloat scale = 0.8f;
+        [UIView animateWithDuration:.3 animations:^{
+            for (UIViewController *viewController in self.viewControllers) {
+                // 这里负责缩小页面的。
+                viewController.view.transform = CGAffineTransformMakeScale(scale, scale);
+                viewController.view.userInteractionEnabled = (1.0 <= scale) ? YES : NO;
+                CALayer *layer = viewController.view.layer;
+                layer.shadowPath = [UIBezierPath bezierPathWithRect:viewController.view.bounds].CGPath;
+            }
+            self.isSmallSize = YES;
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:.3 animations:^{
+                self.scrollView.contentOffset = CGPointMake(self.scrollView.frame.size.width * index , 0);
+            } completion:^(BOOL finished) {
+                self.currentPage = index;
+                [self didChangeCurrentPageDelegate];
+                if ( 1.0 == originScale ){
+                    [self resizeSubViewControlerToSize:originScale];
+                }
+                
+            }];
+        }];
+        
+    } else {
+        self.scrollView.contentOffset = CGPointMake(self.scrollView.frame.size.width * index , 0);
+        self.currentPage = index;
+        [self didChangeCurrentPageDelegate];
+    }
 }
 
 - (void) delCurrentViewContrller
