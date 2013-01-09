@@ -328,9 +328,8 @@
     if ( ! animations ){
         if ( 1 == self.viewControllers.count ){
             self.currentPage = 0;
-        } else {
-            [self didChangeCurrentPageDelegate];
         }
+        [self didChangeCurrentPageDelegate];
     }
     self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width * [self.viewControllers count], 1);
     
