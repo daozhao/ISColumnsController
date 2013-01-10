@@ -471,8 +471,8 @@
                         if ([viewController respondsToSelector:@selector(didBecomeActive)]) {
                             [viewController didBecomeActive];
                         }
-                        [self didChangeCurrentPageDelegate];
                     }
+                    [self didChangeCurrentPageDelegate];
                     
                     self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width * [self.viewControllers count], 1);
                     if ( 1.0 == originScale ){
