@@ -109,6 +109,7 @@
 
 - (void)viewDidUnload
 {
+    self.viewControllers = nil;
     self.scrollView = nil;
 
     self.backgroundColor = nil;
