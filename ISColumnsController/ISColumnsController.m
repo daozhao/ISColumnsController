@@ -110,6 +110,10 @@
 - (void)viewDidUnload
 {
     self.scrollView = nil;
+
+    self.backgroundColor = nil;
+    self.backgroundImage = nil;
+    self.backgroundImageView = nil;
     
     [super viewDidUnload];
 }
@@ -121,6 +125,9 @@
     
     [_viewControllers release];
     [_scrollView release];
+    [_backgroundColor release];
+    [_backgroundImage release];
+    [_backgroundImageView release];
     
     [super don_dealloc];
 }
