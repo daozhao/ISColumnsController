@@ -18,7 +18,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    self.columnsController = [[[ISColumnsController alloc] init] autorelease];
+//    self.columnsController = [[[ISColumnsController alloc] init] autorelease];
+    self.columnsController = [[[ISColumnsController alloc] initWithBackgroundImage:[UIImage imageNamed:@"background.png"] backgroundColor:[UIColor grayColor]] autorelease];
     self.columnsController.delegate = self;
     self.columnsController.navigationItem.titleView = [self loadTitleView];
     self.columnsController.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"Reload"
@@ -56,7 +57,7 @@
                                                                                target:self
                                                                                action:@selector(delControllerAtLast)] autorelease]
                                              , nil]];
-    [self reloadViewControllers];
+//    [self reloadViewControllers];
     
     self.navigationController = [[[UINavigationController alloc] init] autorelease];
     self.navigationController.viewControllers = [NSArray arrayWithObject:self.columnsController];

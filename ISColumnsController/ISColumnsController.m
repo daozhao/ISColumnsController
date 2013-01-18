@@ -31,6 +31,23 @@
                           context:nil];
         
     }
+    self.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+    self.scrollView.backgroundColor = self.backgroundColor;
+    
+    return self;
+}
+
+- (id)initWithBackgroundImage:(UIImage *)image backgroundColor:(UIColor *)color
+{
+    self = [self init];
+    self.backgroundColor = color;
+    self.backgroundImage = image;
+    
+//    self.scrollView.backgroundColor = self.backgroundColor;
+    self.scrollView.backgroundColor = [UIColor clearColor];
+    self.backgroundImageView.image = self.backgroundImage;
+    [self.backgroundImageView sizeToFit];
+    
     return self;
 }
 
@@ -47,7 +64,13 @@
     self.scrollView.delegate = self;
     self.scrollView.autoresizingMask = (UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight);
     self.scrollView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
-    self.scrollView.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+//    self.scrollView.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+    
+    self.backgroundImageView = [[UIImageView alloc] init];
+    self.backgroundImageView.autoresizingMask = (UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight);
+    self.scrollView.backgroundColor = [UIColor clearColor];
+    
+    [self.view addSubview:self.backgroundImageView];
     [self.view addSubview:self.scrollView];
     
     if (!_tap) {
@@ -362,7 +385,7 @@
                         [self resizeSubViewControlerToSize:originScale];
                     }
                     
-                    
+                    [self didChangeCurrentPageDelegate];
                 }];
             }];
             
@@ -549,6 +572,9 @@
 #pragma mark - IScolumnsControllerdelegate
 - (void) didChangeCurrentPageDelegate
 {
+    if ( self.backgroundImage ){
+        self.scrollView.backgroundColor =  0 == self.viewControllers.count ? [UIColor clearColor] : self.backgroundColor ;
+    }
     if ( _delegate && [_delegate respondsToSelector:@selector(didChangePage:currentPage:numberOfPages:)] ){
         if ( self.currentPage < self.viewControllers.count ){
             [_delegate didChangePage:[self.viewControllers objectAtIndex:self.currentPage] currentPage:self.currentPage numberOfPages:self.viewControllers.count];

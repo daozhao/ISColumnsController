@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		440C909D16A931660085F11A /* background.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 440C909C16A931660085F11A /* background.PNG */; };
 		7737A06515F34ADD0078CA7B /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7737A06415F34ADD0078CA7B /* QuartzCore.framework */; };
 		7737A06815F34D6D0078CA7B /* ISViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7737A06715F34D6D0078CA7B /* ISViewController.xib */; };
 		7737A06F15F350610078CA7B /* ISColumnsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7737A06E15F350610078CA7B /* ISColumnsController.m */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		440C909C16A931660085F11A /* background.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.PNG; sourceTree = "<group>"; };
 		4487BF48168C2CCE0021625D /* ARCSupporDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARCSupporDefine.h; sourceTree = "<group>"; };
 		7737A06415F34ADD0078CA7B /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		7737A06715F34D6D0078CA7B /* ISViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ISViewController.xib; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 		77E3743C158E0C44007C75E8 /* Columns */ = {
 			isa = PBXGroup;
 			children = (
+				440C909C16A931660085F11A /* background.PNG */,
 				77E37445158E0C44007C75E8 /* ISAppDelegate.h */,
 				77E37446158E0C44007C75E8 /* ISAppDelegate.m */,
 				77E37451158E11BA007C75E8 /* ISViewController.h */,
@@ -171,6 +174,7 @@
 			files = (
 				77E37441158E0C44007C75E8 /* InfoPlist.strings in Resources */,
 				7737A06815F34D6D0078CA7B /* ISViewController.xib in Resources */,
+				440C909D16A931660085F11A /* background.PNG in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

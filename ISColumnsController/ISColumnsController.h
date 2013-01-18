@@ -16,9 +16,14 @@
 
 @property (retain, nonatomic) NSMutableArray *viewControllers;
 @property (retain, nonatomic) UIScrollView  *scrollView;
+@property (retain, nonatomic) UIImageView  *backgroundImageView;
+@property (retain, nonatomic) UIImage  *backgroundImage;
+@property (retain, nonatomic) UIColor  *backgroundColor;
 
 @property (assign, nonatomic) id<ISColumnsControllerDelegate> delegate;
 @property(nonatomic) NSInteger currentPage;
+
+- (id)initWithBackgroundImage:(UIImage *)image backgroundColor:(UIColor *)color;
 
 - (void) resizeSubViewControler;
 
@@ -30,5 +35,6 @@
 
 - (void) moveToViewController:(UIViewController *) viewController withAnimations:(BOOL) animations;
 - (void) moveToViewControllerAtIndex:(NSUInteger) index withAnimations:(BOOL) animations;
+
 
 @end
