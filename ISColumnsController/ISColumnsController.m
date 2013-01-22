@@ -68,6 +68,7 @@
     
     self.backgroundImageView = [[UIImageView alloc] init];
     self.backgroundImageView.autoresizingMask = (UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight);
+    self.backgroundImageView.contentMode = UIViewContentModeTopLeft;
     self.scrollView.backgroundColor = [UIColor clearColor];
     
     [self.view addSubview:self.backgroundImageView];
